@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.flobi.floAuction.floAuction;
+import com.flobi.floAuction3.floAuction;
 
 
 public class items {

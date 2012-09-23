@@ -1,4 +1,4 @@
-package com.flobi.floAuction;
+package com.flobi.floAuction3;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
