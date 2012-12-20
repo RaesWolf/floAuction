@@ -1,6 +1,6 @@
-package com.flobi.floAuction3.scopes;
+package com.flobi.floAuction3.economies;
 
-public class WorldWide implements AuctionScope {
+public class VaultEconomy {
 
 	/**
 	 * @param args

@@ -1,6 +1,6 @@
-package com.flobi.floAuction3.scopes;
+package com.flobi.floAuction3.economies;
 
-public class WorldGuardRegion implements AuctionScope{
+public class EssentialsEconomy {
 
 	/**
 	 * @param args

@@ -1,6 +1,6 @@
-package com.flobi.floAuction3.scopes;
+package com.flobi.floAuction3;
 
-public class ChatChannel {
+public class AuctionQueue {
 
 	/**
 	 * @param args

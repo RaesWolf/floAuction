@@ -15,9 +15,8 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.flobi.floAuction3.scopes.AuctionScope;
 
-public class CentralProcessing implements Listener, CommandExecutor, Runnable {
+public class CommandRouting implements Listener, CommandExecutor, Runnable {
 
 	private static List<AuctionScope> scopes = new ArrayList<AuctionScope>();
 	
@@ -28,11 +27,15 @@ public class CentralProcessing implements Listener, CommandExecutor, Runnable {
 
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event){
-		
+		for (AuctionScope scope: scopes) {
+			scope.reclaimParticipant(event.getPlayer().getName());
+		}
 	}
 	@EventHandler
-	public void onPlayerChangedWorld(PlayerGameModeChangeEvent event){
-		
+	public void onPlayerChangedMode(PlayerGameModeChangeEvent event){
+		for (AuctionScope scope: scopes) {
+			scope.reclaimParticipant(event.getPlayer().getName());
+		}
 	}
 	
 	@Override
