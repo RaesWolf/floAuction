@@ -1,11 +1,15 @@
 chat-prefix: '&f[&7flo&9Auction&f] &9'
+display-name-prefix: '&o'
 plugin-enabled: '&fhas been enabled.'
 plugin-disabled: '&fhas been disabled.'
 no-whatisit: Disabled due to no WhatIsIt dependency found!
+whatisit-recommended: WhatIsIt plugin highly recommended for full item information!
 no-vault: Disabled due to no Vault dependency found!
 no-economy: Disabled due to no Economy found!
 plugin-reloaded: '&fconfiguration has been reloaded.'
 no-permission: '&6You do not have permission.'
+disabled-command: '&6You cannot do that while participating in an auction.'
+auctionhouse-escape-warning: '&6You cannot leave the auction house while participating in an auction.'
 suspension-user: '&6Your auction access has been suspended.'
 suspension-user-success: 'The user has been suspended.'
 suspension-user-fail-already-suspended: '&6That user is already suspended.'
@@ -23,6 +27,7 @@ parse-error-invalid-bid-increment: '&6The bid increment you specified is invalid
 parse-error-invalid-time: '&6The time you specified is invalid.'
 parse-error-invalid-bid: '&6The bid amount you specified is invalid.'
 parse-error-invalid-max-bid: '&6The max bid amount you specified is invalid.'
+parse-error-invalid-buynow: '&6The BuyNow amount you specified is invalid.'
 
 auction-fail-banned: '&6You cannot auction this.'
 auction-fail-start-tax: '&6You cannot afford to start an auction.'
@@ -33,6 +38,8 @@ auction-fail-starting-bid-too-low: '&6The starting bid is too low.'
 auction-fail-starting-bid-too-high: '&6The starting bid is too high.'
 auction-fail-increment-too-low: '&6The bid increment is too small.'
 auction-fail-increment-too-high: '&6The bid increment is too large.'
+auction-fail-buynow-too-low: '&6The BuyNow amount is too small.'
+auction-fail-buynow-too-high: '&6The BuyNow amount is too large.'
 auction-fail-time-too-low: '&6The specified time is too short.'
 auction-fail-time-too-high: '&6The specified time is too long.'
 auction-fail-invalid-owner: '&6A non-player tried to start an auction?'
@@ -47,65 +54,94 @@ auction-fail-no-early-end: '&6You cannot end auctions early.'
 auction-fail-disabled: '&6Enter &9/auction on&6 to use the auction software.'
 auction-fail-gamemode-creative: '&6You cannot auction while in CREATIVE mode.'
 auction-fail-damaged-item: '&6You cannot auction damaged items.'
+auction-fail-no-sealed-auctions: '&6Sealed auctions are disabled.'
+auction-fail-renamed-item: '&6You cannot auction renamed items.'
+auction-fail-outside-auctionhouse: '&6You must auction at the auction house.'
+auction-fail-banned-lore: '&6This item contains banned lore.'
 
 bid-success-no-challenger: '&b%B&9 has bid &6%b&9 on the &a%i&9.'
 bid-success-outbid: '&b%B&9 raised the bid to &6%b&9.'
 bid-success-update-own-bid: '&b%B&9 raised the bid to &6%b&9.'
 bid-success-update-own-maxbid: You raised your own max bid to &6%h&9.
+bid-success-sealed: '&bYour bid has been placed.'
 bid-auto-outbid: '&b%B&9 has raised the bid to &6%b&9.'
 bid-fail-is-auction-owner: '&6You cannot bid on your own auction.'
 bid-fail-already-current-bidder: '&6Your bid remains unchanged.'
 bid-fail-cant-allocate-funds: '&6You cannot afford that bid.'
 bid-fail-no-bidder: '&6A non-player tried to bid on an auction?'
-bid-fail-console: &6Console bidding is prohibited.
+bid-fail-console: '&6Console bidding is prohibited.'
 bid-fail-no-auction: '&6There is no auction at this time on which to bid.'
 bid-fail-auto-outbid: '&6You have been automatically outbid.'
 bid-fail-gamemode-creative: '&6You cannot bid while in CREATIVE mode.'
 bid-fail-under-starting-bid: '&6The bidding must start at %s.'
+bid-fail-bid-required: '&6You must enter a bid amount.'
+bid-fail-too-low: '&6Your bid was too low.'
+bid-fail-outside-auctionhouse: '&6You must auction at the auction house.'
+bid-fail-buynow-expired: '&6BuyNow option missing or expired.'
 
-auction-queue-enter: Your auction has been queued. 
+confiscation-fail-console: '&6Only online players can impound items (you have no inventory, console).'
+confiscation-fail-self: '&6You cannot impound your own items.'
+
+auction-queue-enter: Your auction has been queued (number %Q in line). 
 auction-queue-fail-full: '&6The auction queue is full, try again later.'
-auction-queue-fail-in-queue: '&6You already have an auction queued.'
-auction-queue-fail-current-auction: '&6ou are already running an auction.'
+auction-queue-fail-in-queue: '&6You already have an auction queued (number %Q in line).'
+auction-queue-fail-current-auction: '&6You are already running an auction.'
+auction-queue-status-in-queue: 'You are number %Q of %k in the auction queue.'
+auction-queue-status-not-in-queue: 'There are %k auctions queued, none belong to you.'
 
 auction-cancel: The auction has been cancelled.
+auction-cancel-queued: Your auction has been removed from the queue.
+auction-confiscated: '&6This auction has been impounded by %O!'
 auction-end-nobids: The auction ended with no bids.
 auction-end: '&b%B&9 won the auction for &a%i&9 with &6%b&9!'
 auction-disabled: '&bAuctioning disabled.'
 auction-enabled: '&bAuctioning enabled.'
 auction-start: '&cAttention, an auction is beginning!'
 auction-help: 
-- /auction help|? - Returns this
-- /auction start|s (amt) (price) (inc) (time)
-- Starts an auction for (time) seconds with (amt)
-- of item in hand for (price) with an enforced 
-- increase of (inc) between bids.
-- /bid (bid) (maxbid) - Bids on auction.
-- If you set a (maxbid) and the (bid) is greater than the
-- current, you will outbit that bid if it's lower than your maximum.
-- If you omit a (bid) the lowest allowable bid will be used.
-- /auction end|e|stop - Ends current auction
-- /auction cancel|c - Cancels current auction
-- /auction info|i - Returns current auction information. 
+- '&b/auction&4|&bauc start&4|&bs &6[QTY] [PRICE] [INC] [TIME] [BUYNOW]&9 - Starts an auction for &6[TIME]&9 seconds with &6[QTY]&9 of item in hand for &6[PRICE]&9 with an enforced increase of &6[INC]&9 between bids and an option to buy item for &6[BUYNOW]&9. &a("&4|&a" means "or" meaning you can any option in &4|&a lists)'
+- '&b/auction&4|&bauc end&4|&be&4|&bstop&9 - Ends current auction'
+- '&b/auction&4|&bauc cancel&4|&bc&9 - Cancels current auction'
+- '&b/auction&4|&bauc info&4|&bi&9 - Returns current auction info.'
+- '&b/bid &6[BID] [MAXBID]&9 - Bids on auction. If you set a &6[MAXBID]&9 and the &6[BID]&9 is greater than the current, you will outbit that bid if it''s lower than your maximum. If you omit a &6[BID]&9 the lowest allowable bid will be used.'
+- '&b/sauction&4|&bsauc start&4|&bs &6[QTY] [PRICE] [INC] [TIME]&9 - Starts a sealed auction. '
+- '&b/auction&4|&bauc stfu&4|&bignore&4|&bquiet&4|&boff&4|&bsilent&4|&bsilence&9 - Opt out of auction participation and announcements.'
 
 auction-start-tax: You have been charged an auction tax of %x.
 auction-end-tax: An auction tax of %X has been extracted from your winnings.
 
+auction-info-suppressed-alt: '&b%O&9 is auctioning &f%q&a %i&9 for &c%t&9. Starting bid: &6%s&9. Bid increment: &6%n&9. Type &a/auction info&9 for full details.'
 auction-info-header: '&b%O&9 is auctioning &f%q&a %i&9 for &c%t&9.'
-auction-info-header-nobids: '&b%O&9 is auctioning &f%q %i&9 for &c%t&9.'
-auction-info-enchantment: 'Item contains enchantment: &a%E'
+auction-info-header-nobids: '&b%O&9 is auctioning &f%q&a %i&9 for &c%t&9.'
+auction-info-header-sealed: 
+- '&b%O&9 is auctioning &f%q %i&9&a for &c%t&9.'
+- 'This is a SEALED auction.'
+auction-info-enchantment: 'Enchantments: &a%F'
+auction-info-enchantment-separator: '&9, &a'
+auction-info-enchantment-none: 'No Enchantments'
+auction-info-display-name: 'Actual Item Type: &a%d'
 auction-info-book-title: 'Book is titled: &a%Y'
 auction-info-book-author: 'Book signed by: &a%y'
 auction-info-damage: 'Item damaged: &6%D &aremaining.'
+auction-info-payload: 'Firework payload: &a%A'
+auction-info-payload-separator: '&9, &a'
+auction-info-payload-power: 'Firework Flight Duration: &a%r'
+auction-info-buynow: 'Buy now for &c%f &9with &a/bid buy&9.'
+
 auction-info-footer: 
 - The current bid is &6%b&9 by &b%B&9.
 - Min bid increment is &6&9%n&9. 
 auction-info-footer-nobids: 
-- Bidding starts at &6%b&9.
+- Bidding starts at &6%s&9.
+- Min bid increment is &6%n&9. 
+auction-info-footer-sealed: 
+- Bidding starts at &6%s&9.  
 - Min bid increment is &6%n&9. 
 auction-info-no-auction: 
 - Nothing is being auctioned at this time.
-- '&00&11&22&33&44&55&66&77&88&99&aa&bb&cc&dd&ff'
+
+auction-info-lore-header: '--&1LORE&9--------------------'
+auction-info-lore-detail: '|  &5&o%L'
+auction-info-lore-footer: '--------------------&1LORE&9--'
 
 timer-countdown-notification: Auction has &c%t&9 remaining.
 time-format-minsec: '%m min, %s sec'
@@ -122,3 +158,48 @@ lot-give: '&dYour items have been added to your inventory.'
 lot-drop: '&dNot enough space, your items dropped at your feet.'
 
 anti-snipe-time-added: 'ANTI-SNIPE! More time added to auction!'
+
+prep-save-success:
+- 'Usage: &b/auction prep &6[QTY] [PRICE] [INC] [TIME]'
+- 'Quantity to auction: &6%U'
+- 'Starting bid: &6%V'
+- 'Minimum increment between bids: &6%W'
+- 'Auction length: &6%Z'
+- Use &b/auction start &9to start an auction with these parameters.
+prep-save-success-with-buynow:
+- 'Usage: &b/auction prep &6[QTY] [PRICE] [INC] [TIME] [BUYNOW]'
+- 'Quantity to auction: &6%U'
+- 'Starting bid: &6%V'
+- 'Minimum increment between bids: &6%W'
+- 'Auction length: &6%Z'
+- 'BuyNow amount: &6%G'
+- Use &b/auction start &9to start an auction with these parameters.
+prep-amount-in-hand: 'Amount in hand'
+prep-all-of-this-kind: 'All items matching held item'
+prep-qty-of-this-kind: '%u items'
+
+firework-shapes:
+  BALL: Ball
+  BALL_LARGE: Large Ball
+  STAR: Star
+  BURST: Burst
+  CREEPER: Creeper
+firework-colors:
+  1E1B1B: Black
+  B3312C: Red
+  3B511A: Green
+  51301A: Brown
+  253192: Blue
+  7B2FBE: Purple
+  287697: Cyan
+  ABABAB: Light Gray
+  434343: Gray
+  D88198: Pink
+  41CD34: Lime
+  DECF2A: Yellow
+  6689D3: Light Blue
+  C354CD: Magenta
+  EB8844: Orange
+  F0F0F0: White
+firework-twinkle: Twinkle
+firework-trail: Trail

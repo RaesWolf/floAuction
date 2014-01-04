@@ -8,6 +8,8 @@ max-starting-bid: 10000
 default-bid-increment: 1
 min-bid-increment: 1
 max-bid-increment: 100
+max-buynow: 10000
+expire-buynow-at-first-bid: false
 
 default-auction-time: 60
 min-auction-time: 15
@@ -16,6 +18,7 @@ max-auction-time: 120
 decimal-places: 2
 
 allow-max-bids: true
+allow-buynow: true
 allow-early-end: false
 allow-gamemode-creative: false
 allow-damaged-items: false
@@ -36,7 +39,36 @@ anti-snipe: false
 anti-snipe-prevention-seconds: 15
 anti-snipe-extension-seconds: 10
 
+allow-sealed-auctions: true
+allow-unsealed-auctions: true
+allow-renamed-items: true
+
+broadcast-bid-updates: true
+allow-auto-bid: true
+
+suppress-countdown: false
+suppress-auction-start-info: true
+
+allow-inferior-item-name-logic: false
+
 banned-items: 
   - 7
   - 383;63
   
+taxed-items: 
+  0: 100%
+
+auctionhouse-world: ''
+auctionhouse-min-x: 0.0
+auctionhouse-min-y: 0.0
+auctionhouse-min-z: 0.0
+auctionhouse-max-x: 0.0
+auctionhouse-max-y: 0.0
+auctionhouse-max-z: 0.0
+
+disabled-commands:
+  - '/ma join'
+  - '/mobarena join'
+
+banned-lore:
+  - mcMMO Ability Tool

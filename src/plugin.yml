@@ -1,9 +1,10 @@
 name: floAuction
-version: 2.5.0
+version: 2.10.0
 description: Auction plugin for economies.
 author: flobi
 website: http://dev.bukkit.org/server-mods/floauction/
-depend: [WhatIsIt, Vault]
+depend: [Vault]
+softdepend: [WhatIsIt]
 
 main: com.flobi.floAuction.floAuction
 database: false
@@ -11,12 +12,24 @@ database: false
 commands:
   auction:
     description: General auction command.
-    permission: auction.start
+    permissions: auction.start
+    usage: Type /<command> for instructions.
+  sealedauction:
+    description: General auction command.
+    permissions: auction.start
+    usage: Type /<command> for instructions.
+  auc:
+    description: General auction command.
+    permissions: auction.start
+    usage: Type /<command> for instructions.
+  sauc:
+    description: General auction command.
+    permissions: auction.start
     usage: Type /<command> for instructions.
   bid:
     description: Bid on auctions.
-    permission: auction.bid
-    usage: /<command> [bit amount] [max bid]
+    permissions: auction.bid
+    usage: /<command> [bid amount] [max bid]
 
 permissions:
   auction.*:

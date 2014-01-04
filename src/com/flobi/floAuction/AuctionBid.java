@@ -1,8 +1,12 @@
 package com.flobi.floAuction;
 
+import java.util.Map;
+
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.flobi.utility.functions;
+import com.flobi.utility.items;
 
 public class AuctionBid {
 	private Auction auction;
@@ -23,11 +27,21 @@ public class AuctionBid {
 	}
 	private boolean reserveBidFunds() {
 		long amountToReserve = 0;
-		AuctionBid currentBid = auction.getCurrentBid(); 
+		long previousSealedReserve = 0;
+		AuctionBid currentBid = auction.getCurrentBid();
+		
+		for(int i = 0; i < auction.sealedBids.size(); i++) {
+			if (auction.sealedBids.get(i).getBidder().equalsIgnoreCase(this.getBidder())) {
+				previousSealedReserve += auction.sealedBids.get(i).getBidAmount();
+				auction.sealedBids.remove(i);
+				i--;
+			}
+		}
+		
 		if (currentBid != null && currentBid.getBidder().equalsIgnoreCase(bidderName)) {
 			// Same bidder: only reserve difference.
-			if (maxBidAmount > currentBid.getMaxBidAmount()) {
-				amountToReserve = maxBidAmount - currentBid.getMaxBidAmount();
+			if (maxBidAmount > currentBid.getMaxBidAmount() + previousSealedReserve) {
+				amountToReserve = maxBidAmount - currentBid.getMaxBidAmount() - previousSealedReserve;
 			} else {
 				// Nothing needing reservation.
 				return true;
@@ -44,19 +58,48 @@ public class AuctionBid {
 		}
 	}
 	public void cancelBid() {
-		// Refund reserve.
-		functions.depositPlayer(bidderName, reserve);
-		reserve = 0;
+		if (auction.sealed) {
+			// Queue reserve refund.
+			auction.sealedBids.add(this);
+			Participant.addParticipant(getBidder());
+		} else {
+			// Refund reserve.
+			functions.depositPlayer(bidderName, reserve);
+			reserve = 0;
+		}
+		
 	}
 	public void winBid() {
 		Double unsafeBidAmount = functions.getUnsafeMoney(bidAmount);
 		
 		// Extract taxes:
 		Double taxes = 0D;
-		if (floAuction.taxPercentage > 0D) {
-			taxes = unsafeBidAmount * (floAuction.taxPercentage / 100D);
+		double taxPercent = floAuction.taxPercentage; 
+		ItemStack typeStack = auction.getLotType();
+
+		for (Map.Entry<String, String> entry : floAuction.taxedItems.entrySet()) {
+			if (items.isSameItem(typeStack, entry.getKey())) {
+				if (entry.getValue().endsWith("%")) {
+					try {
+						taxPercent = Double.valueOf(entry.getValue().substring(0, entry.getValue().length() - 1));
+					} catch (Exception e) {
+						// Clearly this isn't a valid number, just forget about it.
+						taxPercent = floAuction.taxPercentage;
+					}
+				}
+				break;
+			}
+		}
+		
+		
+		if (taxPercent > 0D) {
+			taxes = unsafeBidAmount * (taxPercent / 100D);
+			
+			auction.extractedPostTax = taxes;
+			
 			floAuction.sendMessage("auction-end-tax", auction.getOwner(), auction);
 			unsafeBidAmount -= taxes;
+			
 			if (!floAuction.taxDestinationUser.isEmpty()) floAuction.econ.depositPlayer(floAuction.taxDestinationUser, taxes);
 		}
 		
@@ -74,6 +117,17 @@ public class AuctionBid {
 			error = "bid-fail-no-bidder";
 			return false;
 		}
+
+		if (!Participant.checkLocation(bidderName)) {
+			error = "bid-fail-outside-auctionhouse";
+			return false;
+		}
+		
+		if (bidderName.equalsIgnoreCase(auction.getOwner()) && !floAuction.allowBidOnOwn) {
+			error = "bid-fail-is-auction-owner";
+			return false;
+		}
+
 		return true;
 	}
 	private Boolean parseArgs() {
@@ -109,11 +163,6 @@ public class AuctionBid {
 	public Boolean raiseBid(Long newBidAmount) {
 		if (newBidAmount <= maxBidAmount && newBidAmount >= bidAmount) {
 			bidAmount = newBidAmount;
-            // see if antisnipe is enabled...
-            if (floAuction.antiSnipe == true && auction.getRemainingTime() <= floAuction.antiSnipePreventionSeconds) {
-	            auction.addToRemainingTime((floAuction.antiSnipeExtensionSeconds));
- 	            floAuction.broadcastMessage(floAuction.textConfig.getString("anti-snipe-time-added"));
-            }
 			return true;
 		} else {
 			return false;
@@ -121,15 +170,24 @@ public class AuctionBid {
 	}
 	private Boolean parseArgBid() {
 		if (args.length > 0) {
-			if (args[0].matches(floAuction.decimalRegex)) {
+			if (!args[0].isEmpty() && args[0].matches(floAuction.decimalRegex)) {
 				bidAmount = functions.getSafeMoney(Double.parseDouble(args[0]));
+				if (bidAmount == 0) {
+					error = "parse-error-invalid-bid";
+					return false;
+				}
 			} else {
 				error = "parse-error-invalid-bid";
 				return false;
 			}
 		} else {
-			// Leaving it up to automatic:
-			bidAmount = 0;
+			if (auction.sealed || !floAuction.allowAutoBid) {
+				error = "bid-fail-bid-required";
+				return false;
+			} else {
+				// Leaving it up to automatic:
+				bidAmount = 0;
+			}
 		}
 		// If the person bids 0, make it automatically the next increment (unless it's the current bidder).
 		if (bidAmount == 0) {
@@ -155,13 +213,13 @@ public class AuctionBid {
 		return true;
 	}
 	private Boolean parseArgMaxBid() {
-		if (!floAuction.allowMaxBids) {
+		if (!floAuction.allowMaxBids || auction.sealed) {
 			// Just ignore it.
 			maxBidAmount = bidAmount;
 			return true;
 		}
 		if (args.length > 1) {
-			if (args[1].matches(floAuction.decimalRegex)) {
+			if (!args[1].isEmpty() && args[1].matches(floAuction.decimalRegex)) {
 				maxBidAmount = functions.getSafeMoney(Double.parseDouble(args[1]));
 			} else {
 				error = "parse-error-invalid-max-bid";
