@@ -306,7 +306,7 @@ public class Auction {
 						return;
 					} else {
 						// raisOwnBid does nothing if it's not the current bidder.
-						bid.raiseOwnBid(currentBid);
+						if (currentBid != null) bid.raiseOwnBid(currentBid);
 						setNewBid(bid, null);
 						end();
 					}
