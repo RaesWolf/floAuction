@@ -1088,8 +1088,10 @@ public class floAuction extends JavaPlugin {
     	String bookAuthor = null;
     	String bookTitle = null;
     	String displayName = null;
+	String itemName = null;
     	String rocketPower = null;
     	ItemStack typeLot = null;
+	String enchantIndicator = null;	
     	String queuePostition = "-";
 
 		for(int i = 0; i < auctionQueue.size(); i++){
@@ -1148,10 +1150,28 @@ public class floAuction extends JavaPlugin {
         	if (displayName == null) displayName = "";
         	
         	if (displayName.isEmpty()) {
-        		displayName = lotType;
+			// displayName is empty, nothing in it
+			itemName = ChatColor.translateAlternateColorCodes('&', textConfig.getString("auction-info-regular-item-name-style")) + lotType;
         	} else {
-        		displayName = ChatColor.translateAlternateColorCodes('&', textConfig.getString("display-name-prefix")) + displayName + ChatColor.translateAlternateColorCodes('&', "&r");
-        	}
+			// Item has a custom name, so take the format from language.yml and replace the %d with the type of item
+			displayName = ChatColor.translateAlternateColorCodes('&', textConfig.getString("auction-info-custom-item-name-style")) + "\"" + displayName + "\"";
+			displayName += ChatColor.translateAlternateColorCodes('&', "&r");
+
+			// Take the item's type format from language.yml, insert its content, then apply its style
+			itemName = textConfig.getString("auction-info-custom-item-name-orig-item-format").replace("%d", lotType);
+			itemName = ChatColor.translateAlternateColorCodes('&', textConfig.getString("auction-info-custom-item-name-orig-item-style")) + itemName;
+			itemName += ChatColor.translateAlternateColorCodes('&', "&r");
+		}
+
+		if(!typeLot.getEnchantments().isEmpty()) {
+			// Take the specified indicator from language.yml
+			enchantIndicator = textConfig.getString("auction-info-enchant-indicator-format");
+			enchantIndicator = ChatColor.translateAlternateColorCodes('&', textConfig.getString("auction-info-enchant-indicator-style")) + enchantIndicator;
+			enchantIndicator += ChatColor.translateAlternateColorCodes('&', "&r");
+		}else{
+			// No enchants on item
+			enchantIndicator = "";
+		}
         	
 			if (typeLot != null && typeLot.getType() == Material.FIREWORK) {
 				Integer power = items.getFireworkPower(typeLot);
@@ -1178,7 +1198,9 @@ public class floAuction extends JavaPlugin {
         	bookAuthor = "-";
         	bookTitle = "-";
         	displayName = "-";
+		itemName = "-";
         	rocketPower = "-";
+		enchantIndicator = "-";
     	}
     	
     	for (int l = 0; l < messageKeys.size(); l++) {
@@ -1209,6 +1231,8 @@ public class floAuction extends JavaPlugin {
 
 				message = message.replace("%q", quantity);
 				message = message.replace("%i", displayName);
+				message = message.replace("%I", itemName);
+				message = message.replace("%e", enchantIndicator);
 				message = message.replace("%s", startingBid);
 				message = message.replace("%n", minBidIncrement);
 				message = message.replace("%f", buyNow);
@@ -1246,8 +1270,11 @@ public class floAuction extends JavaPlugin {
 				message = message.replace("%g", defaultStartArgs[4]);
 				message = message.replace("%G", functions.formatAmount(Double.parseDouble(defaultStartArgs[4])));
 				
-				
 				originalMessage = message;
+
+				// Remove multiple whitespace
+				// (neccessary due to potentially non-existant custom item name and enchant indicators leaving gaps)
+				message = message.replaceAll("\\s+", " ");
 				
 				// Firework charges:
 				if (originalMessage.contains("%A")) {
@@ -1373,7 +1400,9 @@ public class floAuction extends JavaPlugin {
     	}
     	
     }
+    
     public static void broadcastMessage(String message) {
+
     	Player[] onlinePlayers = server.getOnlinePlayers();
     	
     	for (Player player : onlinePlayers) {
@@ -1386,6 +1415,7 @@ public class floAuction extends JavaPlugin {
 			console.sendMessage(message);
 		}
     }
+
     private static void log(CommandSender player, String message) {
     	if (logAuctions) {
     		String playerName = null;
@@ -1443,13 +1473,11 @@ public class floAuction extends JavaPlugin {
         return perms != null;
     }
 
-	public static void sendMessage(String messageKey, String playerName, Auction auction) {
-		if (playerName == null) {
-			sendMessage(messageKey, (CommandSender) null, auction, true);
-		} else {
-			sendMessage(messageKey, server.getPlayer(playerName), auction, false);
-		}
-		
+    public static void sendMessage(String messageKey, String playerName, Auction auction) {
+	if (playerName == null) {
+		sendMessage(messageKey, (CommandSender) null, auction, true);
+	} else {
+		sendMessage(messageKey, server.getPlayer(playerName), auction, false);
 	}
+    }
 }
-
