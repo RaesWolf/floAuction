@@ -72,7 +72,7 @@ auction-info-custom-item-name-orig-item-format: '(%d)'
 # Style for the above:
 auction-info-custom-item-name-orig-item-style: '&e'
 
-bid-success-no-challenger: '&b%B&9 has bid &6%b&9 on the %i %I.'
+bid-success-no-challenger: '&b%B&9 has bid &6%b&9 on the %i %I %e.'
 bid-success-outbid: '&b%B&9 raised the bid to &6%b&9.'
 bid-success-update-own-bid: '&b%B&9 raised the bid to &6%b&9.'
 bid-success-update-own-maxbid: You raised your own max bid to &6%h&9.
