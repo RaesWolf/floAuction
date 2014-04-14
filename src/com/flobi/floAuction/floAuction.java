@@ -513,9 +513,11 @@ public class floAuction extends JavaPlugin {
     	// Make sure the decimalPlaces loaded correctly.
     	// Sometimes the econ loads after floAuction.
 	    if (!loadedDecimalFromVault && econ.isEnabled()) {
-	    	loadedDecimalFromVault = true;
-			decimalPlaces = econ.fractionalDigits();
-			config.set("decimal-places", decimalPlaces);
+			if(econ.fractionalDigits() >= 0) {
+				loadedDecimalFromVault = true;
+				decimalPlaces = econ.fractionalDigits();
+				config.set("decimal-places", decimalPlaces);
+			}
 			if (decimalPlaces < 1) {
 				decimalRegex = "^[0-9]{1,13}$";
 			} else if (decimalPlaces == 1) {
