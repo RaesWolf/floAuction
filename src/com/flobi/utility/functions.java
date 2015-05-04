@@ -1,10 +1,9 @@
 package com.flobi.utility;
 
-import java.text.DecimalFormat;
-
+import com.flobi.floAuction.floAuction;
 import net.milkbowl.vault.economy.EconomyResponse;
 
-import com.flobi.floAuction.floAuction;
+import java.text.DecimalFormat;
 
 public class functions {
 
@@ -140,7 +139,11 @@ public class functions {
 		if (!floAuction.econ.isEnabled()) return "-";
 		return floAuction.econ.format(unsafeMoney);
 	}
-	
+
+	public static boolean hasMoney(String playerName, double money) {
+		return floAuction.econ.has(playerName, money);
+	}
+
 	public static boolean withdrawPlayer(String playerName, long safeMoney) {
 		return withdrawPlayer(playerName, getUnsafeMoney(safeMoney));
 	}

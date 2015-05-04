@@ -1403,9 +1403,9 @@ public class floAuction extends JavaPlugin {
     
     public static void broadcastMessage(String message) {
 
-    	Player[] onlinePlayers = server.getOnlinePlayers();
+    	//Player[] onlinePlayers = server.getOnlinePlayers();
     	
-    	for (Player player : onlinePlayers) {
+    	for (Player player : server.getOnlinePlayers()) {
         	if (voluntarilyDisabledUsers.indexOf(player.getName()) == -1 && Participant.checkLocation(player.getName())) {
         		player.sendMessage(message);
     		}
