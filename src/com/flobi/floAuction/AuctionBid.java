@@ -1,12 +1,11 @@
 package com.flobi.floAuction;
 
-import java.util.Map;
-
+import com.flobi.utility.functions;
+import com.flobi.utility.items;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.flobi.utility.functions;
-import com.flobi.utility.items;
+import java.util.Map;
 
 public class AuctionBid {
 	private Auction auction;
@@ -171,10 +170,15 @@ public class AuctionBid {
 	private Boolean parseArgBid() {
 		if (args.length > 0) {
 			if (!args[0].isEmpty() && args[0].matches(floAuction.decimalRegex)) {
-				bidAmount = functions.getSafeMoney(Double.parseDouble(args[0]));
+				long bidAmount = functions.getSafeMoney(Double.parseDouble(args[0]));
 				if (bidAmount == 0) {
 					error = "parse-error-invalid-bid";
 					return false;
+				} else if (!functions.hasMoney(bidderName, bidAmount)) {
+					error = "bid-fail-cant-allocate-funds";
+					return false;
+				} else {
+					this.bidAmount = bidAmount;
 				}
 			} else {
 				error = "parse-error-invalid-bid";
